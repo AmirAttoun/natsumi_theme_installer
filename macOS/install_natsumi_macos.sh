@@ -7,7 +7,7 @@
 print_message() {
   local message="$1"
   local color="$2"
-  
+
   case "$color" in
     "green") echo -e "\033[0;32m$message\033[0m" ;;
     "yellow") echo -e "\033[0;33m$message\033[0m" ;;
@@ -64,11 +64,11 @@ fi
 if [[ ! "$CHROME_DIR" == */chrome ]]; then
     CHROME_PARENT="$CHROME_DIR"
     CHROME_DIR="${CHROME_DIR%/}/chrome"
-    
+
     # Frage den Benutzer, ob er den chrome-Unterordner erstellen möchte
     print_message "Der ausgewählte Ordner ist nicht der 'chrome'-Ordner." "yellow"
     print_message "Möchten Sie den Ordner '$CHROME_DIR' verwenden? (j/n)" "yellow"
-    
+
     read -n 1 -r
     echo
     if [[ ! $REPLY =~ ^[Jj]$ ]]; then
@@ -187,7 +187,7 @@ if [ $USERCHROME_EXISTS -eq 1 ]; then
     # Vorhandene userChrome.css sichern
     print_message "Vorhandene userChrome.css wird gesichert..." "yellow"
     cp "$CHROME_DIR/userChrome.css" "$CHROME_DIR/userChrome.css.backup"
-    
+
     # Prüfen, ob die Import-Zeile bereits in userChrome.css existiert
     if ! grep -q "$IMPORT_LINE" "$CHROME_DIR/userChrome.css"; then
         # Import-Zeile am Anfang von userChrome.css hinzufügen
@@ -202,7 +202,7 @@ else
     # userChrome.css aus dem Repository kopieren
     print_message "userChrome.css wird in das Chrome-Verzeichnis kopiert..." "yellow"
     cp "$TEMP_DIR/natsumi-browser-main/userChrome.css" "$CHROME_DIR/"
-    
+
     if [ $? -ne 0 ]; then
         print_message "Fehler beim Kopieren von userChrome.css." "red"
         echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
@@ -216,7 +216,7 @@ if [ $USERCONTENT_EXISTS -eq 1 ]; then
     # Vorhandene userContent.css sichern
     print_message "Vorhandene userContent.css wird gesichert..." "yellow"
     cp "$CHROME_DIR/userContent.css" "$CHROME_DIR/userContent.css.backup"
-    
+
     # Prüfen, ob die Import-Zeile bereits in userContent.css existiert
     if ! grep -q "$PAGES_IMPORT_LINE" "$CHROME_DIR/userContent.css"; then
         # Import-Zeile am Anfang von userContent.css hinzufügen
@@ -231,7 +231,7 @@ else
     # userContent.css aus dem Repository kopieren
     print_message "userContent.css wird in das Chrome-Verzeichnis kopiert..." "yellow"
     cp "$TEMP_DIR/natsumi-browser-main/userContent.css" "$CHROME_DIR/"
-    
+
     if [ $? -ne 0 ]; then
         print_message "Fehler beim Kopieren von userContent.css." "red"
         echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
@@ -252,5 +252,5 @@ print_message "Bitte starten Sie den Zen Browser neu, um das Theme anzuwenden." 
 echo ""
 
 # Warten auf Benutzereingabe, bevor das Fenster geschlossen wird
-echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
+echo "Drücken Sie die Eingabetaste, um das Fenster zu schliessen..."
 read

@@ -1,4 +1,4 @@
-# Natsumi Browser Theme Installer - Combined Instructions
+# Natsumi Browser Theme Installer - Instructions
 
 This guide explains how to install the Natsumi theme for Zen Browser on both Windows 11 and macOS platforms.
 
