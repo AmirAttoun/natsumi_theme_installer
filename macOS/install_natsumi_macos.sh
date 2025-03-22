@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Natsumi Browser Theme Installer - macOS Version
-# Dieses Skript installiert das Natsumi-Theme für den Zen Browser auf macOS
+# This script installs the Natsumi theme for Zen Browser on macOS
 
-# Funktion zum Anzeigen von farbigen Nachrichten
+# Function to display colored messages
 print_message() {
   local message="$1"
   local color="$2"
@@ -17,24 +17,24 @@ print_message() {
   esac
 }
 
-# Titel anzeigen
-print_message "Natsumi Browser Theme Installer für macOS" "cyan"
+# Display title
+print_message "Natsumi Browser Theme Installer for macOS" "cyan"
 print_message "=======================================" "cyan"
 echo ""
 
-# Ordnerauswahldialog mit AppleScript
-print_message "Bitte wählen Sie den Chrome-Ordner Ihres Zen Browser-Profils..." "yellow"
-echo "Ein Dialogfenster wird geöffnet, um den Ordner auszuwählen."
+# Folder selection dialog with AppleScript
+print_message "Please select the Chrome folder of your Zen Browser profile..." "yellow"
+echo "A dialog window will open to select the folder."
 echo ""
 
-# Standardpfad für Zen Browser auf macOS
+# Default path for Zen Browser on macOS
 DEFAULT_PATH="$HOME/Library/Application Support/zen/Profiles"
 
-# AppleScript für Ordnerauswahl
+# AppleScript for folder selection
 CHROME_DIR=$(osascript <<EOF
 set defaultPath to "$DEFAULT_PATH"
-set dialogText to "Wählen Sie den Chrome-Ordner Ihres Zen Browser-Profils"
-set buttonText to "Auswählen"
+set dialogText to "Select the Chrome folder of your Zen Browser profile"
+set buttonText to "Select"
 
 tell application "System Events"
     if exists folder defaultPath then
@@ -52,205 +52,205 @@ end tell
 EOF
 )
 
-# Prüfen, ob der Dialog abgebrochen wurde
+# Check if dialog was canceled
 if [ -z "$CHROME_DIR" ]; then
-    print_message "Ordnerauswahl abgebrochen. Installation wird beendet." "red"
-    echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
+    print_message "Folder selection canceled. Installation aborted." "red"
+    echo "Press Enter to close this window..."
     read
     exit 1
 fi
 
-# Prüfen, ob der ausgewählte Ordner "chrome" heißt, wenn nicht, füge "/chrome" hinzu
+# Check if the selected folder is named "chrome", if not, add "/chrome"
 if [[ ! "$CHROME_DIR" == */chrome ]]; then
     CHROME_PARENT="$CHROME_DIR"
     CHROME_DIR="${CHROME_DIR%/}/chrome"
 
-    # Frage den Benutzer, ob er den chrome-Unterordner erstellen möchte
-    print_message "Der ausgewählte Ordner ist nicht der 'chrome'-Ordner." "yellow"
-    print_message "Möchten Sie den Ordner '$CHROME_DIR' verwenden? (j/n)" "yellow"
+    # Ask the user if they want to create the chrome subfolder
+    print_message "The selected folder is not the 'chrome' folder." "yellow"
+    print_message "Do you want to use the folder '$CHROME_DIR'? (y/n)" "yellow"
 
     read -n 1 -r
     echo
-    if [[ ! $REPLY =~ ^[Jj]$ ]]; then
-        print_message "Installation abgebrochen." "red"
-        echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        print_message "Installation canceled." "red"
+        echo "Press Enter to close this window..."
         read
         exit 1
     fi
 fi
 
-print_message "Ausgewählter Chrome-Ordner: $CHROME_DIR" "green"
+print_message "Selected Chrome folder: $CHROME_DIR" "green"
 echo ""
 
-# Prüfen, ob das Chrome-Verzeichnis existiert
+# Check if the Chrome directory exists
 if [ ! -d "$CHROME_DIR" ]; then
-    print_message "Chrome-Verzeichnis wird erstellt: $CHROME_DIR" "yellow"
+    print_message "Creating Chrome directory: $CHROME_DIR" "yellow"
     mkdir -p "$CHROME_DIR"
 fi
 
-# Temporäres Verzeichnis für den Download erstellen
+# Create temporary directory for download
 TEMP_DIR=$(mktemp -d)
-print_message "Temporäres Verzeichnis wird erstellt: $TEMP_DIR" "yellow"
+print_message "Creating temporary directory: $TEMP_DIR" "yellow"
 cd "$TEMP_DIR"
 
-# Repository herunterladen
-print_message "Natsumi Browser Theme-Dateien werden heruntergeladen..." "yellow"
+# Download repository
+print_message "Downloading Natsumi Browser theme files..." "yellow"
 curl -L -o natsumi.zip https://github.com/greeeen-dev/natsumi-browser/archive/refs/heads/main.zip
 
 if [ $? -ne 0 ]; then
-    print_message "Fehler beim Herunterladen der Dateien. Bitte überprüfen Sie Ihre Internetverbindung." "red"
-    echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
+    print_message "Error downloading files. Please check your internet connection." "red"
+    echo "Press Enter to close this window..."
     read
     exit 1
 fi
 
-# ZIP-Datei extrahieren
-print_message "Dateien werden entpackt..." "yellow"
+# Extract ZIP file
+print_message "Extracting files..." "yellow"
 unzip -q natsumi.zip
 
 if [ $? -ne 0 ]; then
-    print_message "Fehler beim Entpacken der Dateien." "red"
-    echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
+    print_message "Error extracting files." "red"
+    echo "Press Enter to close this window..."
     read
     exit 1
 fi
 
-# Prüfen, ob userChrome.css bereits existiert
+# Check if userChrome.css already exists
 USERCHROME_EXISTS=0
 if [ -f "$CHROME_DIR/userChrome.css" ]; then
     USERCHROME_EXISTS=1
-    print_message "Vorhandene userChrome.css gefunden." "green"
+    print_message "Existing userChrome.css found." "green"
 else
-    print_message "Keine vorhandene userChrome.css gefunden." "yellow"
+    print_message "No existing userChrome.css found." "yellow"
 fi
 
-# Prüfen, ob userContent.css bereits existiert
+# Check if userContent.css already exists
 USERCONTENT_EXISTS=0
 if [ -f "$CHROME_DIR/userContent.css" ]; then
     USERCONTENT_EXISTS=1
-    print_message "Vorhandene userContent.css gefunden." "green"
+    print_message "Existing userContent.css found." "green"
 else
-    print_message "Keine vorhandene userContent.css gefunden." "yellow"
+    print_message "No existing userContent.css found." "yellow"
 fi
 
-# natsumi-Ordner im Chrome-Verzeichnis erstellen, falls er nicht existiert
+# Create natsumi folder in Chrome directory if it doesn't exist
 if [ ! -d "$CHROME_DIR/natsumi" ]; then
-    print_message "natsumi-Ordner wird erstellt..." "yellow"
+    print_message "Creating natsumi folder..." "yellow"
     mkdir -p "$CHROME_DIR/natsumi"
 fi
 
-# natsumi-pages-Ordner im Chrome-Verzeichnis erstellen, falls er nicht existiert
+# Create natsumi-pages folder in Chrome directory if it doesn't exist
 if [ ! -d "$CHROME_DIR/natsumi-pages" ]; then
-    print_message "natsumi-pages-Ordner wird erstellt..." "yellow"
+    print_message "Creating natsumi-pages folder..." "yellow"
     mkdir -p "$CHROME_DIR/natsumi-pages"
 fi
 
-# natsumi-config.css in das Chrome-Verzeichnis kopieren
-print_message "natsumi-config.css wird in das Chrome-Verzeichnis kopiert..." "yellow"
+# Copy natsumi-config.css to Chrome directory
+print_message "Copying natsumi-config.css to Chrome directory..." "yellow"
 cp "$TEMP_DIR/natsumi-browser-main/natsumi-config.css" "$CHROME_DIR/"
 
 if [ $? -ne 0 ]; then
-    print_message "Fehler beim Kopieren von natsumi-config.css." "red"
-    echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
+    print_message "Error copying natsumi-config.css." "red"
+    echo "Press Enter to close this window..."
     read
     exit 1
 fi
 
-# natsumi-Ordnerinhalte in das Chrome-Verzeichnis kopieren
-print_message "natsumi-Ordnerinhalte werden in das Chrome-Verzeichnis kopiert..." "yellow"
+# Copy natsumi folder contents to Chrome directory
+print_message "Copying natsumi folder contents to Chrome directory..." "yellow"
 cp -R "$TEMP_DIR/natsumi-browser-main/natsumi/"* "$CHROME_DIR/natsumi/"
 
 if [ $? -ne 0 ]; then
-    print_message "Fehler beim Kopieren des natsumi-Ordners." "red"
-    echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
+    print_message "Error copying natsumi folder." "red"
+    echo "Press Enter to close this window..."
     read
     exit 1
 fi
 
-# natsumi-pages-Ordnerinhalte in das Chrome-Verzeichnis kopieren
-print_message "natsumi-pages-Ordnerinhalte werden in das Chrome-Verzeichnis kopiert..." "yellow"
+# Copy natsumi-pages folder contents to Chrome directory
+print_message "Copying natsumi-pages folder contents to Chrome directory..." "yellow"
 cp -R "$TEMP_DIR/natsumi-browser-main/natsumi-pages/"* "$CHROME_DIR/natsumi-pages/"
 
 if [ $? -ne 0 ]; then
-    print_message "Fehler beim Kopieren des natsumi-pages-Ordners." "red"
-    echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
+    print_message "Error copying natsumi-pages folder." "red"
+    echo "Press Enter to close this window..."
     read
     exit 1
 fi
 
-# Import-Zeilen erstellen
+# Create import lines
 IMPORT_LINE='@import "natsumi/natsumi.css";'
 PAGES_IMPORT_LINE='@import "natsumi-pages/natsumi-pages.css";'
 
-# userChrome.css behandeln, je nachdem, ob sie existiert
+# Handle userChrome.css based on whether it exists
 if [ $USERCHROME_EXISTS -eq 1 ]; then
-    # Vorhandene userChrome.css sichern
-    print_message "Vorhandene userChrome.css wird gesichert..." "yellow"
+    # Backup existing userChrome.css
+    print_message "Backing up existing userChrome.css..." "yellow"
     cp "$CHROME_DIR/userChrome.css" "$CHROME_DIR/userChrome.css.backup"
 
-    # Prüfen, ob die Import-Zeile bereits in userChrome.css existiert
+    # Check if the import line already exists in userChrome.css
     if ! grep -q "$IMPORT_LINE" "$CHROME_DIR/userChrome.css"; then
-        # Import-Zeile am Anfang von userChrome.css hinzufügen
-        print_message "Import-Zeile wird zur vorhandenen userChrome.css hinzugefügt..." "yellow"
+        # Add import line to the beginning of userChrome.css
+        print_message "Adding import line to existing userChrome.css..." "yellow"
         echo "$IMPORT_LINE" > "$TEMP_DIR/temp_combined.txt"
         cat "$CHROME_DIR/userChrome.css" >> "$TEMP_DIR/temp_combined.txt"
         mv "$TEMP_DIR/temp_combined.txt" "$CHROME_DIR/userChrome.css"
     else
-        print_message "Import-Zeile existiert bereits in userChrome.css." "green"
+        print_message "Import line already exists in userChrome.css." "green"
     fi
 else
-    # userChrome.css aus dem Repository kopieren
-    print_message "userChrome.css wird in das Chrome-Verzeichnis kopiert..." "yellow"
+    # Copy userChrome.css from the repository
+    print_message "Copying userChrome.css to Chrome directory..." "yellow"
     cp "$TEMP_DIR/natsumi-browser-main/userChrome.css" "$CHROME_DIR/"
 
     if [ $? -ne 0 ]; then
-        print_message "Fehler beim Kopieren von userChrome.css." "red"
-        echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
+        print_message "Error copying userChrome.css." "red"
+        echo "Press Enter to close this window..."
         read
         exit 1
     fi
 fi
 
-# userContent.css behandeln, je nachdem, ob sie existiert
+# Handle userContent.css based on whether it exists
 if [ $USERCONTENT_EXISTS -eq 1 ]; then
-    # Vorhandene userContent.css sichern
-    print_message "Vorhandene userContent.css wird gesichert..." "yellow"
+    # Backup existing userContent.css
+    print_message "Backing up existing userContent.css..." "yellow"
     cp "$CHROME_DIR/userContent.css" "$CHROME_DIR/userContent.css.backup"
 
-    # Prüfen, ob die Import-Zeile bereits in userContent.css existiert
+    # Check if the import line already exists in userContent.css
     if ! grep -q "$PAGES_IMPORT_LINE" "$CHROME_DIR/userContent.css"; then
-        # Import-Zeile am Anfang von userContent.css hinzufügen
-        print_message "Import-Zeile wird zur vorhandenen userContent.css hinzugefügt..." "yellow"
+        # Add import line to the beginning of userContent.css
+        print_message "Adding import line to existing userContent.css..." "yellow"
         echo "$PAGES_IMPORT_LINE" > "$TEMP_DIR/temp_content_combined.txt"
         cat "$CHROME_DIR/userContent.css" >> "$TEMP_DIR/temp_content_combined.txt"
         mv "$TEMP_DIR/temp_content_combined.txt" "$CHROME_DIR/userContent.css"
     else
-        print_message "Import-Zeile existiert bereits in userContent.css." "green"
+        print_message "Import line already exists in userContent.css." "green"
     fi
 else
-    # userContent.css aus dem Repository kopieren
-    print_message "userContent.css wird in das Chrome-Verzeichnis kopiert..." "yellow"
+    # Copy userContent.css from the repository
+    print_message "Copying userContent.css to Chrome directory..." "yellow"
     cp "$TEMP_DIR/natsumi-browser-main/userContent.css" "$CHROME_DIR/"
 
     if [ $? -ne 0 ]; then
-        print_message "Fehler beim Kopieren von userContent.css." "red"
-        echo "Drücken Sie die Eingabetaste, um das Fenster zu schließen..."
+        print_message "Error copying userContent.css." "red"
+        echo "Press Enter to close this window..."
         read
         exit 1
     fi
 fi
 
-# Temporäres Verzeichnis bereinigen
-print_message "Temporäre Dateien werden bereinigt..." "yellow"
+# Clean up temporary directory
+print_message "Cleaning up temporary files..." "yellow"
 rm -rf "$TEMP_DIR"
 
 echo ""
-print_message "Installation abgeschlossen!" "green"
-print_message "Natsumi Browser Theme wurde installiert in: $CHROME_DIR" "green"
+print_message "Installation complete!" "green"
+print_message "Natsumi Browser theme has been installed to: $CHROME_DIR" "green"
 echo ""
-print_message "Bitte starten Sie den Zen Browser neu, um das Theme anzuwenden." "cyan"
+print_message "Please restart Zen Browser to apply the theme." "cyan"
 echo ""
 
-# Warten auf Benutzereingabe, bevor das Fenster geschlossen wird
-echo "Drücken Sie die Eingabetaste, um das Fenster zu schliessen..."
+# Wait for user input before closing the window
+echo "Press Enter to close this window..."
 read
